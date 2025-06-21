@@ -19,9 +19,12 @@ import toast from "react-hot-toast";
 import ChatLoader from "../components/ChatLoader";
 import CallButton from "../components/CallButton";
 
+import { useThemeStore } from "./store/useThemeStore.js";
+
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 const ChatPage = () => {
+  const { theme } = useThemeStore();
   const { id: targetUserId } = useParams();
 
   const [chatClient, setChatClient] = useState(null);
@@ -59,7 +62,7 @@ const ChatPage = () => {
 
         // neha and ram
         // if ram start the chat => channelId: [ramId, nehaId]
-        // if neha start the chat => channelId: [nehaId, ramId] 
+        // if neha start the chat => channelId: [nehaId, ramId]
         // so to maintain consistency and keep channelId same, we use SORTING of array
 
         const currChannel = client.channel("messaging", channelId, {
@@ -96,7 +99,7 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="h-[93vh]">
+    <div className="h-[93vh]" data-theme={theme}>
       <Chat client={chatClient}>
         <Channel channel={channel}>
           <div className="w-full relative">

@@ -12,12 +12,13 @@ const useUnreadCounts = (friends) => {
 
   const { authUser } = useAuthUser();
 
-  const { data: tokenData } = useQuery({
+  const { data: tokenData, isSuccess: tokenReady } = useQuery({
     queryKey: ["streamToken"],
     queryFn: getStreamToken,
     enabled: !!authUser,
   });
 
+  // ✅ Initialize client only after token + user available
   useEffect(() => {
     const initClient = async () => {
       if (!authUser || !tokenData?.token) return;
@@ -39,10 +40,17 @@ const useUnreadCounts = (friends) => {
     };
 
     initClient();
-  }, [authUser, tokenData]);
+  }, [authUser, tokenReady]);
 
+  // ✅ Watch unread counts only when streamClient + friends are ready
   useEffect(() => {
-    if (!streamClient || !authUser || !friends?.length) return;
+    if (
+      !streamClient ||
+      !authUser ||
+      !Array.isArray(friends) ||
+      friends.length === 0
+    )
+      return;
 
     let isMounted = true;
     const listeners = [];
@@ -62,7 +70,7 @@ const useUnreadCounts = (friends) => {
           // Initial unread count
           counts[friend._id] = channel.countUnread();
 
-          // Listener for new messages
+          // Real-time updates
           const updateUnread = () => {
             const newCount = channel.countUnread();
             setUnreadMap((prev) => ({ ...prev, [friend._id]: newCount }));
@@ -71,7 +79,7 @@ const useUnreadCounts = (friends) => {
           channel.on("message.new", updateUnread);
           listeners.push({ channel, updateUnread });
         } catch (err) {
-          console.error("Error watching channel for", friend._id, err);
+          console.error("Error setting up unread for", friend._id, err);
           counts[friend._id] = 0;
         }
       }

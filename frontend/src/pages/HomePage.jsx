@@ -21,6 +21,15 @@ import NoFriendsFound from "../components/NoFriendsFound";
 import useUnreadCounts from "../hooks/useUnreadCounts";
 
 const HomePage = () => {
+  // useEffect(() => {
+  //   const firstVisit = sessionStorage.getItem("homeFirstVisit");
+
+  //   if (!firstVisit) {
+  //     sessionStorage.setItem("homeFirstVisit", "true");
+  //     window.location.reload(); // 👈 Force reload
+  //   }
+  // }, []);
+
   const queryClient = useQueryClient();
   const [outgoingRequestsIds, setOutgoingRequestsIds] = useState(new Set());
 
