@@ -18,7 +18,7 @@ const useUnreadCounts = (friends) => {
     enabled: !!authUser,
   });
 
-  // ✅ Initialize client only after token + user available
+  // Initialize client only after token + user available
   useEffect(() => {
     const initClient = async () => {
       if (!authUser || !tokenData?.token) return;
@@ -42,7 +42,7 @@ const useUnreadCounts = (friends) => {
     initClient();
   }, [authUser, tokenReady]);
 
-  // ✅ Watch unread counts only when streamClient + friends are ready
+  // Watch unread counts only when streamClient + friends are ready
   useEffect(() => {
     if (
       !streamClient ||
