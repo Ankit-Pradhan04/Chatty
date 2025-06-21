@@ -7,6 +7,7 @@ import {
   UserCheckIcon,
 } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound";
+import {capitialize} from "../lib/utils.js";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -71,10 +72,10 @@ const NotificationsPage = () => {
                               </h3>
                               <div className="flex flex-wrap gap-1.5 mt-1">
                                 <span className="badge badge-secondary badge-sm">
-                                  Native: {request.sender.nativeLanguage}
+                                  Native: {capitialize(request.sender.nativeLanguage)}
                                 </span>
                                 <span className="badge badge-outline badge-sm">
-                                  Learning: {request.sender.learningLanguage}
+                                  Learning: {capitialize(request.sender.learningLanguage)}
                                 </span>
                               </div>
                             </div>
