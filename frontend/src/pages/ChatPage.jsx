@@ -15,7 +15,7 @@ import {
 } from "stream-chat-react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
-import "stream-chat-react/dist/css/v2/index.css"; // or use your custom scss
+import "stream-chat-react/dist/css/v2/index.css";
 
 import ChatLoader from "../components/ChatLoader";
 import CallButton from "../components/CallButton";
@@ -38,26 +38,26 @@ const ChatPage = () => {
   });
 
   // 👇 Keyboard open detection (mobile/tablets)
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        const chatChannel = document.querySelector(".str-chat__channel");
-        if (chatChannel) {
-          const isKeyboardOpen =
-            window.innerHeight < window.screen.height * 0.75;
-          chatChannel.classList.toggle("keyboard-open", isKeyboardOpen);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth <= 768) {
+  //       const chatChannel = document.querySelector(".str-chat__channel");
+  //       if (chatChannel) {
+  //         const isKeyboardOpen =
+  //           window.innerHeight < window.screen.height * 0.75;
+  //         chatChannel.classList.toggle("keyboard-open", isKeyboardOpen);
+  //       }
+  //     }
+  //   };
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("orientationchange", handleResize);
+  //   window.addEventListener("resize", handleResize);
+  //   window.addEventListener("orientationchange", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("orientationchange", handleResize);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //     window.removeEventListener("orientationchange", handleResize);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const initChat = async () => {
