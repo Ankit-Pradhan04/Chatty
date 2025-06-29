@@ -117,7 +117,7 @@ const ChatPage = () => {
           <div className="w-full relative">
             <CallButton handleVideoCall={handleVideoCall} />
             <Window>
-              <ChannelHeader />
+              <ChannelHeader/> 
               <MessageList />
               <MessageInput focus keepOpenAfterSend />
             </Window>
