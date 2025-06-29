@@ -24,9 +24,11 @@ const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 const ChatPage = () => {
   const { id: targetUserId } = useParams();
+
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const { authUser } = useAuthUser();
 
   const { data: tokenData } = useQuery({
@@ -34,6 +36,28 @@ const ChatPage = () => {
     queryFn: getStreamToken,
     enabled: !!authUser,
   });
+
+  // 👇 Keyboard open detection (mobile/tablets)
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth <= 768) {
+  //       const chatChannel = document.querySelector(".str-chat__channel");
+  //       if (chatChannel) {
+  //         const isKeyboardOpen =
+  //           window.innerHeight < window.screen.height * 0.75;
+  //         chatChannel.classList.toggle("keyboard-open", isKeyboardOpen);
+  //       }
+  //     }
+  //   };
+
+  //   window.addEventListener("resize", handleResize);
+  //   window.addEventListener("orientationchange", handleResize);
+
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //     window.removeEventListener("orientationchange", handleResize);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const initChat = async () => {
@@ -52,6 +76,7 @@ const ChatPage = () => {
         );
 
         const channelId = [authUser._id, targetUserId].sort().join("-");
+
         const currChannel = client.channel("messaging", channelId, {
           members: [authUser._id, targetUserId],
         });
@@ -74,9 +99,11 @@ const ChatPage = () => {
   const handleVideoCall = () => {
     if (channel) {
       const callUrl = `${window.location.origin}/call/${channel.id}`;
+
       channel.sendMessage({
         text: `I've started a video call. Join me here: ${callUrl}`,
       });
+
       toast.success("Video call link sent successfully!");
     }
   };
@@ -84,17 +111,15 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="relative">
+    <div className="h-[90vh]">
       <Chat client={chatClient}>
         <Channel channel={channel}>
           <div className="w-full relative">
-            <div className="absolute right-10 z-40">
-              <CallButton handleVideoCall={handleVideoCall} />
-            </div>
+            <CallButton handleVideoCall={handleVideoCall} />
             <Window>
-              <ChannelHeader />
+              <ChannelHeader/> 
               <MessageList />
-              <MessageInput focus keepOpenAfterSend />
+              <MessageInput focus />
             </Window>
           </div>
           <Thread />
