@@ -15,6 +15,7 @@ import {
 } from "stream-chat-react";
 import { StreamChat } from "stream-chat";
 import toast from "react-hot-toast";
+import "stream-chat-react/dist/css/v2/index.css"; // or use your custom scss
 
 import ChatLoader from "../components/ChatLoader";
 import CallButton from "../components/CallButton";
@@ -33,16 +34,36 @@ const ChatPage = () => {
   const { data: tokenData } = useQuery({
     queryKey: ["streamToken"],
     queryFn: getStreamToken,
-    enabled: !!authUser, // this will run only when authUser is available
+    enabled: !!authUser,
   });
+
+  // 👇 Keyboard open detection (mobile/tablets)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        const chatChannel = document.querySelector(".str-chat__channel");
+        if (chatChannel) {
+          const isKeyboardOpen =
+            window.innerHeight < window.screen.height * 0.75;
+          chatChannel.classList.toggle("keyboard-open", isKeyboardOpen);
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const initChat = async () => {
       if (!tokenData?.token || !authUser) return;
 
       try {
-        console.log("Initializing stream chat client...");
-
         const client = StreamChat.getInstance(STREAM_API_KEY);
 
         await client.connectUser(
@@ -54,12 +75,7 @@ const ChatPage = () => {
           tokenData.token
         );
 
-        //
         const channelId = [authUser._id, targetUserId].sort().join("-");
-
-        // you and me
-        // if i start the chat => channelId: [myId, yourId]
-        // if you start the chat => channelId: [yourId, myId]  => [myId,yourId]
 
         const currChannel = client.channel("messaging", channelId, {
           members: [authUser._id, targetUserId],
@@ -95,7 +111,7 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="h-[93vh]">
+    <div className="">
       <Chat client={chatClient}>
         <Channel channel={channel}>
           <div className="w-full relative">
@@ -103,7 +119,7 @@ const ChatPage = () => {
             <Window>
               <ChannelHeader />
               <MessageList />
-              <MessageInput focus />
+              <MessageInput focus keepOpenAfterSend />
             </Window>
           </div>
           <Thread />
@@ -112,4 +128,5 @@ const ChatPage = () => {
     </div>
   );
 };
+
 export default ChatPage;
