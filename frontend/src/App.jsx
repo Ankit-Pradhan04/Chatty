@@ -16,6 +16,10 @@ import PageLoader from "./components/PageLoader.jsx";
 import useAuthUser from "./hooks/useAuthUser.js";
 import Layout from "./components/Layout.jsx";
 import { useThemeStore } from "./store/useThemeStore.js";
+import GroupsPage from "./pages/GroupPage.jsx";
+import CreateGroupPage from "./pages/createGroupPage.jsx";
+import GroupChatPage from "./pages/GroupChatPage.jsx";
+import GroupDetailsPage from "./pages/GroupDetailsPage.jsx";
 
 //Tanstack query
 //it is for shortening the code fetching data requests, it also makes process faster
@@ -99,7 +103,6 @@ const App = () => {
             )
           }
         />
-
         <Route
           path="/chat/:id"
           element={
@@ -112,7 +115,6 @@ const App = () => {
             )
           }
         />
-
         <Route
           path="/onboarding"
           element={
@@ -127,7 +129,6 @@ const App = () => {
             )
           }
         />
-
         <Route
           path="/editProfile"
           element={
@@ -144,13 +145,60 @@ const App = () => {
             )
           }
         />
-
         <Route
           path="/profile"
           element={
             <Layout showSidebar={true}>
               <ProfilePage />
             </Layout>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <GroupsPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/groups/new"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <CreateGroupPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/groups/:id"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={false}>
+                <GroupChatPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/groups/:id/info"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <GroupDetailsPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
           }
         />
       </Routes>

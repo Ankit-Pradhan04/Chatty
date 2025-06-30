@@ -1,7 +1,13 @@
 import { Link, useLocation } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
 import useNotificationCount from "../hooks/useNotificationCount";
-import { BellIcon, HomeIcon, ShipWheelIcon, PencilIcon } from "lucide-react";
+import {
+  BellIcon,
+  HomeIcon,
+  ShipWheelIcon,
+  PencilIcon,
+  Users,
+} from "lucide-react";
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
@@ -14,7 +20,7 @@ const Sidebar = () => {
       <div className="p-5 border-b border-base-300">
         <Link to="/" className="flex items-center gap-2.5">
           <ShipWheelIcon className="size-9 text-primary" />
-          <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary  tracking-wider">
+          <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-wider">
             Chatty
           </span>
         </Link>
@@ -29,6 +35,16 @@ const Sidebar = () => {
         >
           <HomeIcon className="size-5 text-base-content opacity-70" />
           <span>Home</span>
+        </Link>
+
+        <Link
+          to="/groups"
+          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
+            currentPath === "/groups" ? "btn-active" : ""
+          }`}
+        >
+          <Users className="size-5 text-base-content opacity-70" />
+          <span>Groups</span>
         </Link>
 
         <Link

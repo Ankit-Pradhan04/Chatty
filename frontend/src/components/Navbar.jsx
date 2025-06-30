@@ -11,6 +11,8 @@ import {
   XIcon,
   PencilIcon,
   HomeIcon,
+  Users,
+  User,
 } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 
@@ -24,11 +26,8 @@ const Navbar = () => {
 
   const currentPath = location.pathname;
 
-  const handleNavClick = () => {
-    setShowSidebar(false);
-  };
+  const handleNavClick = () => setShowSidebar(false);
 
-  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
@@ -39,7 +38,6 @@ const Navbar = () => {
     if (showSidebar) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -62,6 +60,7 @@ const Navbar = () => {
 
             {/* Right: Nav actions */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Mobile menu toggle */}
               <div className="lg:hidden">
                 <button
                   className="btn btn-ghost btn-circle"
@@ -75,11 +74,17 @@ const Navbar = () => {
                 </button>
               </div>
 
+              {/* Theme toggle on mobile */}
               <div className="lg:hidden">
                 <ThemeSelector />
               </div>
 
+              {/* Right actions on large screens */}
               <div className="hidden lg:flex items-center gap-2 sm:gap-3">
+                <Link to="/groups" className="btn btn-ghost btn-circle">
+                  <Users className="h-6 w-6 text-base-content opacity-70" />
+                </Link>
+
                 <div className="relative">
                   <Link to="/notifications">
                     <button className="btn btn-ghost btn-circle">
@@ -92,6 +97,7 @@ const Navbar = () => {
                     </button>
                   </Link>
                 </div>
+
                 <ThemeSelector />
                 <Link to="/profile">
                   <div className="avatar cursor-pointer">
@@ -133,6 +139,18 @@ const Navbar = () => {
               <HomeIcon className="size-5 text-base-content opacity-70" />
               Home
             </Link>
+
+            <Link
+              to="/groups"
+              onClick={handleNavClick}
+              className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
+                currentPath === "/groups" ? "btn-active" : ""
+              }`}
+            >
+              <Users className="size-5 text-base-content opacity-70" />
+              Groups
+            </Link>
+
             <Link
               to="/notifications"
               onClick={handleNavClick}
@@ -148,6 +166,7 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+
             <Link
               to="/editProfile"
               onClick={handleNavClick}
@@ -158,6 +177,7 @@ const Navbar = () => {
               <PencilIcon className="size-5 text-base-content opacity-70" />
               Edit Profile
             </Link>
+
             <Link
               to="/profile"
               onClick={handleNavClick}
