@@ -17,7 +17,7 @@ import useAuthUser from "./hooks/useAuthUser.js";
 import Layout from "./components/Layout.jsx";
 import { useThemeStore } from "./store/useThemeStore.js";
 import GroupsPage from "./pages/GroupPage.jsx";
-import CreateGroupPage from "./pages/createGroupPage.jsx";
+import CreateGroupPage from "./pages/CreateGroupPage.jsx";
 import GroupChatPage from "./pages/GroupChatPage.jsx";
 import GroupDetailsPage from "./pages/GroupDetailsPage.jsx";
 
