@@ -148,9 +148,17 @@ const App = () => {
         <Route
           path="/profile"
           element={
-            <Layout showSidebar={true}>
-              <ProfilePage />
-            </Layout>
+            isAuthenticated ? (
+              !isOnboarded ? (
+                <OnboardingPage />
+              ) : (
+                <Layout showSidebar={true}>
+                  <ProfilePage />
+                </Layout>
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route
