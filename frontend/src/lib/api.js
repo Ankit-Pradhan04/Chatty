@@ -73,7 +73,7 @@ export async function getStreamToken() {
 
 export const fetchGroups = async () => {
   const response = await axiosInstance.get("/groups");
-  console.log("Fetched groups data:", response.data);
+  // console.log("Fetched groups data:", response.data);
   return response.data;
 }
 
@@ -112,7 +112,7 @@ export const getGroupInvites = async () => {
 };
 
 export const respondGroupInvite = async ({ inviteId, action }) => {
-  console.log("jello")
+  // console.log("jello")
   const res = await axiosInstance.patch(`/groups/invites/respond/${inviteId}`, { action });
   return res.data;
 };
