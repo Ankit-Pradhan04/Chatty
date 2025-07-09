@@ -3,11 +3,13 @@ import useAuthUser from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { completeOnboarding } from "../lib/api";
+import { uploadImage } from "../lib/api";
 import {
   LoaderIcon,
   MapPinIcon,
   ShipWheelIcon,
   ShuffleIcon,
+  CameraIcon,
 } from "lucide-react";
 import { LANGUAGES } from "../constants";
 
@@ -40,6 +42,20 @@ const OnboardingPage = () => {
     e.preventDefault();
 
     onboardingMutation(formState);
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      const { url } = await uploadImage(formData);
+      setFormState({ ...formState, profilePic: url });
+      toast.success("Profile picture uploaded!");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    }
   };
 
   const handleRandomAvatar = () => {
@@ -78,6 +94,16 @@ const OnboardingPage = () => {
 
               {/* Generate Random Avatar BTN */}
               <div className="flex items-center gap-2">
+                <label className="btn btn-secondary" htmlFor="profilePicInput">
+                  <CameraIcon className="size-4 mr-2" /> Upload
+                </label>
+                <input
+                  id="profilePicInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
                 <button
                   type="button"
                   onClick={handleRandomAvatar}
