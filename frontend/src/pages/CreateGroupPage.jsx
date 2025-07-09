@@ -1,10 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { getUserFriends, createGroup, sendGroupInvite, uploadImage } from "../lib/api";
+import { getUserFriends, createGroup, sendGroupInvite } from "../lib/api";
 import useAuthUser from "../hooks/useAuthUser";
 import toast from "react-hot-toast"; // ✅ import toast
-import { CameraIcon } from "lucide-react";
 
 const CreateGroupPage = () => {
   const { authUser } = useAuthUser();
@@ -57,20 +56,6 @@ const CreateGroupPage = () => {
     });
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-      const { url } = await uploadImage(formData);
-      setImage(url);
-      toast.success("Group image uploaded!");
-    } catch (err) {
-      toast.error("Failed to upload image");
-    }
-  };
-
   const toggleSelect = (userId) => {
     setSelectedIds((prev) =>
       prev.includes(userId)
@@ -91,25 +76,13 @@ const CreateGroupPage = () => {
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <div className="flex items-center gap-2">
-          <input
-            className="input input-bordered flex-1"
-            type="text"
-            placeholder="Image URL (optional)"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-          <label className="btn btn-secondary" htmlFor="groupImageInput">
-            <CameraIcon className="size-4" />
-          </label>
-          <input
-            id="groupImageInput"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageUpload}
-          />
-        </div>
+        <input
+          className="input input-bordered w-full"
+          type="text"
+          placeholder="Image URL (optional)"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+        />
 
         <div>
           <label className="font-medium mb-2 block">Invite Friends</label>
