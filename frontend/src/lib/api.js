@@ -117,5 +117,12 @@ export const respondGroupInvite = async ({ inviteId, action }) => {
   return res.data;
 };
 
+export const uploadImage = async (formData) => {
+  const response = await axiosInstance.post("/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data; // returns { url: string }
+};
+
 
 

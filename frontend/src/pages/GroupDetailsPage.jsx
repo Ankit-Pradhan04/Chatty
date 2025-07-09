@@ -5,11 +5,13 @@ import {
   getUserFriends,
   updateGroupMembers,
   updateGroupDetails,
-  sendGroupInvite
+  sendGroupInvite,
+  uploadImage
 } from "../lib/api";
 import useAuthUser from "../hooks/useAuthUser";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { CameraIcon } from "lucide-react";
 
 export default function GroupDetailsPage() {
   const { id: groupId } = useParams();
@@ -19,6 +21,19 @@ export default function GroupDetailsPage() {
 
   const [nameEdit, setNameEdit] = useState("");
   const [imgEdit, setImgEdit] = useState("");
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      const { url } = await uploadImage(formData);
+      setImgEdit(url);
+      toast.success("Image uploaded!");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    }
+  };
   const [isEditing, setIsEditing] = useState(false);
   const [selectedId, setSelectedId] = useState("");
 
@@ -92,12 +107,24 @@ export default function GroupDetailsPage() {
               placeholder="Group Name"
               className="input input-bordered w-full"
             />
-            <input
-              value={imgEdit}
-              onChange={(e) => setImgEdit(e.target.value)}
-              placeholder="Image URL"
-              className="input input-bordered w-full"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                value={imgEdit}
+                onChange={(e) => setImgEdit(e.target.value)}
+                placeholder="Image URL"
+                className="input input-bordered flex-1"
+              />
+              <label className="btn btn-secondary" htmlFor="editGroupImageInput">
+                <CameraIcon className="size-4" />
+              </label>
+              <input
+                id="editGroupImageInput"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </div>
           </div>
         ) : (
           <h2 className="text-2xl font-bold flex-1">{group.name}</h2>
