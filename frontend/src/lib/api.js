@@ -97,7 +97,7 @@ export const updateGroupMembers = async ({ groupId, userId, action, makeAdmin })
 }
 
 export const updateGroupDetails = async ({ groupId, name, image }) => {
-  const response = await axiosInstance.patch(`/groups/${groupId}`, { name, image });
+  const response = await axiosInstance.patch(`/groups/updateGroup/${groupId}`, { name, image });
   return response.data;
 }
 
@@ -115,6 +115,13 @@ export const respondGroupInvite = async ({ inviteId, action }) => {
   // console.log("jello")
   const res = await axiosInstance.patch(`/groups/invites/respond/${inviteId}`, { action });
   return res.data;
+};
+
+export const uploadImage = async (formData) => {
+  const response = await axiosInstance.post("/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data; // returns { url: string }
 };
 
 

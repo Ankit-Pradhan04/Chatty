@@ -5,11 +5,13 @@ import {
   getUserFriends,
   updateGroupMembers,
   updateGroupDetails,
-  sendGroupInvite
+  sendGroupInvite,
+  uploadImage
 } from "../lib/api";
 import useAuthUser from "../hooks/useAuthUser";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { CameraIcon, LoaderIcon } from "lucide-react";
 
 export default function GroupDetailsPage() {
   const { id: groupId } = useParams();
@@ -19,6 +21,7 @@ export default function GroupDetailsPage() {
 
   const [nameEdit, setNameEdit] = useState("");
   const [imgEdit, setImgEdit] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedId, setSelectedId] = useState("");
 
@@ -37,6 +40,23 @@ export default function GroupDetailsPage() {
     queryFn: getUserFriends,
     enabled: !!authUser,
   });
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(formData);
+      setImgEdit(url + `?t=${Date.now()}`);
+      toast.success("Image uploaded!");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const membersMutation = useMutation({
     mutationFn: updateGroupMembers,
@@ -67,13 +87,6 @@ export default function GroupDetailsPage() {
     onError: () => toast.error("Failed to save details"),
   });
 
-  if (isLoading || loadingFriends) return <p className="p-4">Loading...</p>;
-
-  const isAdmin = group.admins?.some((a) => a._id === authUser._id);
-  const addableFriends = friends.filter(
-    (f) => !group.members.some((m) => m._id === f._id)
-  );
-
   const confirmEdit = () => {
     const trimmedName = nameEdit.trim();
     const trimmedImg = imgEdit.trim();
@@ -81,27 +94,75 @@ export default function GroupDetailsPage() {
     detailsMutation.mutate({ groupId, name: trimmedName, image: trimmedImg });
   };
 
+  if (isLoading || loadingFriends) return <p className="p-4">Loading...</p>;
+
+  const isAdmin = group.admins?.some((a) => a._id === authUser._id);
+  const addableFriends = friends.filter(
+    (f) => !group.members.some((m) => m._id === f._id)
+  );
+
   return (
     <div className="container mx-auto p-6 max-w-xl">
-      <div className="flex justify-between items-center mb-6">
-        {isAdmin && isEditing ? (
-          <div className="flex-1 pr-4 space-y-2">
-            <input
-              value={nameEdit}
-              onChange={(e) => setNameEdit(e.target.value)}
-              placeholder="Group Name"
-              className="input input-bordered w-full"
-            />
-            <input
-              value={imgEdit}
-              onChange={(e) => setImgEdit(e.target.value)}
-              placeholder="Image URL"
-              className="input input-bordered w-full"
-            />
-          </div>
-        ) : (
-          <h2 className="text-2xl font-bold flex-1">{group.name}</h2>
-        )}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="flex-1 space-y-2">
+          {isEditing ? (
+            <>
+              <input
+                value={nameEdit}
+                onChange={(e) => setNameEdit(e.target.value)}
+                placeholder="Group Name"
+                className="input input-bordered w-full"
+              />
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-base-200 border">
+                  {imgEdit ? (
+                    <img
+                      src={imgEdit}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <CameraIcon className="w-full h-full p-2 text-gray-400" />
+                  )}
+                </div>
+                <label
+                  className={`btn btn-sm btn-secondary ${uploading ? "btn-disabled" : ""}`}
+                  htmlFor="editGroupImageInput"
+                >
+                  {uploading ? (
+                    <>
+                      <LoaderIcon className="animate-spin size-4 mr-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <CameraIcon className="size-4 mr-2" />
+                      Upload Image
+                    </>
+                  )}
+                </label>
+                <input
+                  id="editGroupImageInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold">{group.name}</h2>
+              {group.image && (
+                <img
+                  src={group.image}
+                  alt="Group"
+                  className="w-12 h-12 rounded-full object-cover mt-1"
+                />
+              )}
+            </>
+          )}
+        </div>
         {isAdmin && (
           <div className="flex gap-2">
             {isEditing ? (
@@ -233,7 +294,7 @@ export default function GroupDetailsPage() {
               <button
                 onClick={async () => {
                   try {
-                    await sendGroupInvite ({ groupId, userId: selectedId });
+                    await sendGroupInvite({ groupId, userId: selectedId });
                     toast.success("Invite sent!");
                     setSelectedId("");
                   } catch (err) {

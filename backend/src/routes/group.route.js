@@ -25,7 +25,7 @@ router.patch("/invites/respond/:inviteId", respondGroupInvite);
 
 router.get("/:id", getSingleGroup);
 router.patch("/:groupId/members", updateGroupMembers);
-router.patch("/:groupId", updateGroupDetails);
+router.patch("/updateGroup/:groupId", updateGroupDetails);
 router.post("/:groupId/invite", inviteGroupMember);
 
 export default router;

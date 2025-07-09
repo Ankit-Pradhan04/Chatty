@@ -101,7 +101,7 @@ const GroupChatPage = () => {
           <div className="w-full relative">
             <CallButton handleVideoCall={handleVideoCall} />
             <Window>
-              <ChannelHeader title={group.name} />
+              <ChannelHeader title={group.name} image={group.image} />
               <MessageList />
               <MessageInput focus keepOpenAfterSend />
             </Window>

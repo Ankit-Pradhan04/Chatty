@@ -2,18 +2,22 @@ import { useState } from "react";
 import useAuthUser from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { completeOnboarding } from "../lib/api";
+import { completeOnboarding, uploadImage } from "../lib/api";
 import {
   LoaderIcon,
   MapPinIcon,
   ShipWheelIcon,
   ShuffleIcon,
+  CameraIcon,
 } from "lucide-react";
 import { LANGUAGES } from "../constants";
 
 const OnboardingPage = () => {
   const { authUser } = useAuthUser();
   const queryClient = useQueryClient();
+
+  const [uploading, setUploading] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const [formState, setFormState] = useState({
     fullName: authUser?.fullName || "",
@@ -30,24 +34,41 @@ const OnboardingPage = () => {
       toast.success("Profile onboarded successfully");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
-
     onError: (error) => {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Onboarding failed");
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     onboardingMutation(formState);
   };
 
-  const handleRandomAvatar = () => {
-    const idx = Math.floor(Math.random() * 100) + 1; // 1-100 included
-    const randomAvatar = `https://robohash.org/${idx}.png`;
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(formData);
+      setFormState((prev) => ({ ...prev, profilePic: url + `?t=${Date.now()}` }));
+      toast.success("Profile picture uploaded!");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
-    setFormState({ ...formState, profilePic: randomAvatar });
+  const handleRandomAvatar = async () => {
+    setGenerating(true);
+    const idx = Math.floor(Math.random() * 100) + 1;
+    const randomAvatar = `https://robohash.org/${idx}.png?t=${Date.now()}`;
+    await new Promise((res) => setTimeout(res, 300)); // simulate load
+    setFormState((prev) => ({ ...prev, profilePic: randomAvatar }));
     toast.success("Random profile picture generated!");
+    setGenerating(false);
   };
 
   return (
@@ -62,7 +83,7 @@ const OnboardingPage = () => {
             {/* PROFILE PIC CONTAINER */}
             <div className="flex flex-col items-center justify-center space-y-4">
               {/* IMAGE PREVIEW */}
-              <div className="size-32 rounded-full bg-base-300 overflow-hidden">
+              <div key={formState.profilePic} className="size-32 rounded-full bg-base-300 overflow-hidden">
                 {formState.profilePic ? (
                   <img
                     src={formState.profilePic}
@@ -76,15 +97,49 @@ const OnboardingPage = () => {
                 )}
               </div>
 
-              {/* Generate Random Avatar BTN */}
-              <div className="flex items-center gap-2">
+              {/* Upload and Generate Buttons */}
+              <div className="flex flex-wrap items-center gap-2 justify-center">
+                <label
+                  className={`btn btn-secondary ${uploading ? "btn-disabled" : ""}`}
+                  htmlFor="profilePicInput"
+                >
+                  {uploading ? (
+                    <>
+                      <LoaderIcon className="animate-spin size-4 mr-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <CameraIcon className="size-4 mr-2" />
+                      Upload
+                    </>
+                  )}
+                </label>
+                <input
+                  id="profilePicInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+
                 <button
                   type="button"
                   onClick={handleRandomAvatar}
                   className="btn btn-accent"
+                  disabled={generating}
                 >
-                  <ShuffleIcon className="size-4 mr-2" />
-                  Generate Random Avatar
+                  {generating ? (
+                    <>
+                      <LoaderIcon className="animate-spin size-4 mr-2" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <ShuffleIcon className="size-4 mr-2" />
+                      Generate Random Avatar
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -196,7 +251,6 @@ const OnboardingPage = () => {
             </div>
 
             {/* SUBMIT BUTTON */}
-
             <button
               className="btn btn-primary w-full"
               disabled={isPending}
@@ -220,4 +274,5 @@ const OnboardingPage = () => {
     </div>
   );
 };
+
 export default OnboardingPage;

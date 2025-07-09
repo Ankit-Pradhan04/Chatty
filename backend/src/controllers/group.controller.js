@@ -146,13 +146,14 @@ export const updateGroupMembers = async (req, res) => {
 export const updateGroupDetails = async (req, res) => {
   const { groupId } = req.params;
   const { name, image } = req.body;
+  console.log("jello");
 
-  if (!name.trim()) return res.status(400).json({ message: "Name is required" });
+  // if (!name.trim()) return res.status(400).json({ message: "Name is required" });
 
   const group = await Group.findById(groupId);
   if (!group) return res.status(404).json({ message: "Group not found" });
 
-  group.name = name;
+  if(name) group.name = name;
   group.image = image || group.image;
   await group.save();
 
